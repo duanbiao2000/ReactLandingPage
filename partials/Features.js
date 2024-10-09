@@ -8,8 +8,20 @@ function Features() {
 
   const tabs = useRef(null);
 
+  /**
+   * 调整选项卡容器的高度以适应当前选项卡
+   * 
+   * 此函数确保选项卡容器能根据当前激活选项卡的高度来自适应其高度
+   * 它通过获取当前选项卡的实际高度，并设置选项卡容器的高度为该值
+   * 
+   * 使用场景：
+   * 1. 当选项卡内容高度不一致时，平滑过渡到每个选项卡的高度
+   * 2. 动态调整选项卡容器高度，以提升用户体验
+   */
   const heightFix = () => {
+    // 检查当前选项卡索引是否存在于选项卡容器的子元素中
     if (tabs.current.children[tab]) {
+      // 如果存在，设置选项卡容器的高度为当前选项卡的高度
       tabs.current.style.height = tabs.current.children[tab - 1].offsetHeight + 'px'
     }
   }
@@ -82,6 +94,7 @@ function Features() {
                   onClick={(e) => { e.preventDefault(); setTab(3); }}
                 >
                   <div>
+                    {/* // 设置文本样式，其中 "leading-snug" 减小行高，"tracking-tight" 减小字母间距 */}
                     <div className="font-bold leading-snug tracking-tight mb-1">Building the Simple ecosystem</div>
                     <div className="text-gray-600">Take collaboration to the next level with security and administrative features built for teams.</div>
                   </div>
@@ -115,15 +128,22 @@ function Features() {
                   </div>
                 </Transition>
                 {/* Item 2 */}
+                {/* 使用Transition组件来实现动画效果，当tab值为2时显示动画 */}
                 <Transition
                   show={tab === 2}
                   appear={true}
                   className="w-full"
+                  // 定义进入动画的持续时间、缓动函数和初始顺序
                   enter="transition ease-in-out duration-700 transform order-first"
+                  // 进入动画的初始状态：透明度为0，垂直向下移动16像素
                   enterStart="opacity-0 translate-y-16"
+                  // 进入动画的结束状态：透明度为100%，垂直移动到原位置
                   enterEnd="opacity-100 translate-y-0"
+                  // 定义离开动画的持续时间、缓动函数和初始顺序
                   leave="transition ease-in-out duration-300 transform absolute"
+                  // 离开动画的初始状态：透明度为100%，位于原位置
                   leaveStart="opacity-100 translate-y-0"
+                  // 离开动画的结束状态：透明度为0，垂直向上移动16像素
                   leaveEnd="opacity-0 -translate-y-16"
                 >
                   <div className="relative inline-flex flex-col">

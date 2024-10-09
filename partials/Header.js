@@ -10,7 +10,7 @@ function Header() {
     const scrollHandler = () => {
       window.scrollY> 10 ? setTop(false) : setTop(true)
     };
-    window.addEventListener('scroll', scrollHandler);
+    window.addEventListener('scroll', scrollHandle);
     return () => window.removeEventListener('scroll', scrollHandler);
   }, [top]);  
 

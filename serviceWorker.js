@@ -10,20 +10,33 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
 
+// 判断当前URL是否为localhost
+// 在IPv4和IPv6中，有不同的表示方式，此变量用于统一这些情况
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-    // [::1] is the IPv6 localhost address.
+    // [::1]是IPv6的localhost地址
     window.location.hostname === '[::1]' ||
-    // 127.0.0.0/8 are considered localhost for IPv4.
+    // 127.0.0.0/8 在IPv4中被视为localhost
     window.location.hostname.match(
       /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
     )
 );
 
+/**
+ * 注册服务工作者
+ * 
+ * 该函数负责在当前浏览器环境中注册服务工作者（Service Worker）
+ * 服务工作者是一种在客户端运行的脚本，可以拦截网络请求、管理离线缓存等
+ * 
+ * @param {Object} config - 配置对象，用于服务工作者的注册和更新
+ */
 export function register(config) {
+  // 只在生产环境并且浏览器支持serviceWorker时尝试注册
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
+    // 检查PUBLIC_URL是否与当前页面的URL一致
+    // 如果不一致，可能由于CDN等外部因素导致服务工作者无法正常工作
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -31,9 +44,12 @@ export function register(config) {
       return;
     }
 
+    // 页面加载完成后执行
     window.addEventListener('load', () => {
+      // 服务工作者脚本的URL
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
+      // 根据是否在localhost上运行，采取不同的处理方式
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config);
@@ -54,37 +70,48 @@ export function register(config) {
   }
 }
 
+/**
+ * 注册有效的服务工作者
+ * 
+ * 该函数尝试注册一个服务工作者，以便它可以管理缓存并处理离线请求
+ * 当服务工作者更新时，它会等待所有客户端标签页关闭后才使用新的缓存内容
+ * 如果服务工作者成功注册，它将缓存内容以供离线使用
+ * 
+ * @param {string} swUrl - 服务工作者的URL
+ * @param {Object} config - 配置对象，可包含回调函数
+ */
 function registerValidSW(swUrl, config) {
+  // 尝试注册服务工作者
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
+      // 当找到更新的服务工作者时
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
           return;
         }
+        // 当安装状态改变时
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              // At this point, the updated precached content has been fetched,
-              // but the previous service worker will still serve the older
-              // content until all client tabs are closed.
+              // 更新的预缓存内容已经获取，但之前的服务工作者仍然提供旧内容
+              // 直到所有客户端标签页都关闭
               console.log(
                 'New content is available and will be used when all ' +
                   'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
               );
 
-              // Execute callback
+              // 执行回调函数
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
             } else {
-              // At this point, everything has been precached.
-              // It's the perfect time to display a
-              // "Content is cached for offline use." message.
+              // 所有内容已经预缓存
+              // 这是显示"内容已缓存以供离线使用"消息的最佳时机
               console.log('Content is cached for offline use.');
 
-              // Execute callback
+              // 执行回调函数
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
               }
@@ -94,6 +121,7 @@ function registerValidSW(swUrl, config) {
       };
     })
     .catch(error => {
+      // 如果注册过程中出现错误
       console.error('Error during service worker registration:', error);
     });
 }
